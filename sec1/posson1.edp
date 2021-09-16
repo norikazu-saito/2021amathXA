@@ -1,0 +1,36 @@
+// parameters 
+func g = 0;
+func f = 2*x^2+0.5*y^3;
+
+// domain 
+int k = 30;
+border G1(t = 0, 3) {x = t; y = 0;}
+border G2(t = 0, pi/2) {x = 3*cos(t); y = 3*sin(t);}
+border G3(t = 0, 3) {x = 0; y = 3 - t;}
+border G4(t = 0, 2*pi) {x = 1.9 + 0.8*cos(t); y = 0.9 - 0.8*sin(t);}
+border G5(t = 0, 2*pi) {x = 0.7 + 0.5*cos(t); y = 2.3 - 0.5*sin(t);}
+
+// triangulation
+mesh Th = buildmesh(G1(k)+G2(2*k)+G3(k)+G4(2*k)+G5(k));
+
+// P1 element
+fespace Vh(Th,P1); 
+Vh u, v, hh = hTriangle;
+
+// solve
+solve poisson(u, v) = int2d(Th)(dx(u)*dx(v) + dy(u)*dy(v)) - int2d(Th)(f*v)
++ on(G1, G2, G3, G4, G5, u = g);
+
+//results
+ofstream f1("poisson1.plt");
+f1 << "# poisson1.edp: " << hh[].max << endl << endl;
+int i, j; 
+for(i = 0; i < Th.nt ; i++){
+   for(j = 0; j < 3; j++){
+	f1 << Th[i][j].x << " "<< Th[i][j].y << " " << u[][Vh(i,j)] << endl;
+   }
+   f1 << Th[i][0].x << " " << Th[i][0].y << " " << u[][Vh(i,0)] << endl << endl << endl;
+}
+
+// draw 
+plot(Th, ps="poisson1mesh.eps"); 
