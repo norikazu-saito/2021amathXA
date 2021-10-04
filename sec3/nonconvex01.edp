@@ -1,0 +1,41 @@
+// nonconvex01.edp
+// user's choice
+int n = 16;
+real R = 1.0;
+real angle = 0.7;
+// parameters for describing a domain
+real omega = angle*pi;
+real alpha = 1.0/angle;
+// exact solution
+func rd = sqrt(x*x+y*y); 
+func th = (y>=0)? atan2(y,x) : (2*pi-atan2(-y,x));
+func w = pow(rd(x,y),alpha)*sin(alpha*th(x,y));
+func phi = 1 - (rd(x,y)^2)/(R^2);
+func exact = w*phi; // exact solution
+func f = (4.0/(R^2))*(1.0+alpha)*w;  // rifht-hand side function
+func g = 0;                   // Dirichlet boundary condition
+
+// domain
+border G1(t = 0, 1) {x = R*cos(omega*t); y = R*sin(omega*t);}
+border G2(t = 0, 1) {x = (1-t)*R*cos(omega); y = (1-t)*R*sin(omega);}
+border G3(t = 0, 1) {x = R*t; y = 0;}
+
+//triangulation
+mesh Th = buildmesh(G1(omega*n) + G2(n) + G3(n)); ; 
+fespace Vh(Th, P1); 
+Vh u, v, hh = hTriangle; 
+solve Poisson(u,v) = int2d(Th)(dx(u)*dx(v) + dy(u)*dy(v)) - int2d(Th) (f*v)  + on(G1,G2,G3,u = g);
+
+// data file for gnuplot
+ofstream ff("nonconvex01.plt");
+for(int i = 0; i < Th.nt ; i++){
+  for(int j = 0; j < 3; j++){
+     ff << Th[i][j].x << " "<< Th[i][j].y << " " << u[][Vh(i,j)] << endl;
+  }
+  ff << Th[i][0].x << " " << Th[i][0].y << " " << u[][Vh(i,0)] 
+                                                 << endl << endl << endl;
+}
+
+//
+plot(u,Th,dim=3,fill=true);
+

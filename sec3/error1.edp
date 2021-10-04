@@ -1,0 +1,46 @@
+// error1.edp
+func exact = sin(pi*x)*sin(pi*y); // exact solution
+func f = 2.0*pi*pi*exact;         // rifht-hand side function
+func g = exact;                   // Dirichlet boundary condition
+real hsize, hold;                 // mesh size
+real errh1, errh1old, errl2, errl2old, rateh1, ratel2; 
+int n, nn;
+    
+// fine triangulation
+nn = 256;
+mesh Th2 = square(nn, nn); 
+fespace Vh2(Th2, P1); 
+Vh2 uproj, w, uex;
+uex = exact;
+
+// output file	
+ofstream f1("error1.dat");
+
+// n=4,8,16,32,64
+n = 2;
+errh1old = errl2old = 1.0;
+hold = 1.0;
+for (int i = 1; i < 6; i++) {
+    n = 2*n;
+    mesh Th = square(n, n); 
+    plot(Th, ps="error1.eps");
+    fespace Vh(Th, P1); 
+    Vh u, v, hh = hTriangle; 
+    hsize = hh[].max;
+    solve Poisson(u,v) =int2d(Th)(  dx(u)*dx(v) + dy(u)*dy(v)) - int2d(Th) ( f*v )  + on(1,2,3,4,u = g);
+    // computation of error using the fine triangulation
+    uproj = u;       //  projection of u into the fine triangulation
+    w = uproj - uex; // error function 
+    errh1 = sqrt( int2d(Th2)(dx(w)*dx(w) + dy(w)*dy(w)) ); // H1-error
+    errl2 = sqrt( int2d(Th2)(w^2) );                       // L2-error
+    // computation of rates
+    rateh1 = (log(errh1) - log(errh1old))/(log(hsize) - log(hold));     
+    ratel2 = (log(errl2) - log(errl2old))/(log(hsize) - log(hold));
+    errh1old = errh1;
+    errl2old = errl2;
+    hold = hsize;
+    // output results
+    f1 << hsize << " " 
+    << errh1 << " " << rateh1 << " " 
+    << errl2 << " " << ratel2<< " " << endl;
+}
