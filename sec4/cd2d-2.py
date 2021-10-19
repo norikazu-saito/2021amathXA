@@ -41,8 +41,8 @@ u = TrialFunction(V)
 v = TestFunction(V)
 
 # define right-hand side and convection term
-f = Expression("1.0", degree=4)
-b = Expression(("5.0","5.0"), degree=4)
+f = Expression("1.0", degree=1)
+b = Expression(("5.0","5.0"), degree=1)
 
 # solve diffusion-convection
 a = nu*inner(grad(u), grad(v))*dx - u*inner(b, grad(v))*dx 
