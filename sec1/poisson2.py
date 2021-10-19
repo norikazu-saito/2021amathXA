@@ -15,7 +15,7 @@ parameters["form_compiler"]["optimize"] = True
 #mesh = Mesh("lshaped2.xml")
 mesh = Mesh("lshaped3.xml")
 #mesh = Mesh("lshaped4.xml")
-V = FunctionSpace(mesh, "CG", 2)
+V = FunctionSpace(mesh, "CG", 1)
 
 # element data 
 nodes = mesh.coordinates();
@@ -61,6 +61,7 @@ fig5 = plt.figure(5)
 plt.gca().set_aspect('equal')
 my_triangle = tri.Triangulation(nodes[:, 0], nodes[:, 1], mesh.cells())
 plt.rcParams['image.cmap'] = 'plasma' #https://beiznotes.org/matplot-cmap-list/
+#plt.rcParams['image.cmap'] = 'jet' #https://beiznotes.org/matplot-cmap-list/
 plt.tripcolor(my_triangle, solution_vec,  shading='flat', vmin=-1.1e-5, vmax=0.04)
 # delete colorbar
 plt.colorbar()

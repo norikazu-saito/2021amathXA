@@ -15,7 +15,7 @@ parameters["form_compiler"]["optimize"] = True
 mesh = Mesh("square1.xml")
 #mesh = Mesh("square2.xml")
 #mesh = Mesh("square3.xml")
-V = FunctionSpace(mesh, "CG", 2)
+V = FunctionSpace(mesh, "CG", 1)
 
 # element data 
 nodes = mesh.coordinates();
@@ -30,7 +30,7 @@ class DirichletBoundary(SubDomain):
         return on_boundary
 
 # diffusion coefficient
-nu = Constant(0.02)
+nu = Constant(0.5)
     
 # define boundary condition
 u0 = Constant(0.0)
@@ -60,26 +60,7 @@ print (min(solution_vec))
 fig1 = plt.figure(1)
 ax = fig1.gca(projection='3d')
 ax.plot_trisurf(nodes[:,0],nodes[:,1],solution_vec, cmap=plt.cm.Spectral, linewidth=0.1, antialiased=True)
-# contour-line 
-fig5 = plt.figure(5)
-plt.gca().set_aspect('equal')
-my_triangle = tri.Triangulation(nodes[:, 0], nodes[:, 1], mesh.cells())
-plt.rcParams['image.cmap'] = 'plasma' #https://beiznotes.org/matplot-cmap-list/
-#plt.rcParams['image.cmap'] = 'jet' #https://beiznotes.org/matplot-cmap-list/
-plt.tripcolor(my_triangle, solution_vec,  shading='flat', vmin=-1.1e-5, vmax=0.04)
-# delete colorbar
-plt.colorbar()
-# delete frameline
-plt.gca().spines['right'].set_visible(False)
-plt.gca().spines['top'].set_visible(False)
-plt.gca().spines['left'].set_visible(False)
-plt.gca().spines['bottom'].set_visible(False)
-# delete scale
-ax = plt.gca()
-ax.axes.xaxis.set_visible(False)
-ax.axes.yaxis.set_visible(False)
 # plot 
 plt.show()
 # save
-fig1.savefig("cd2d-2a.pdf")
-fig5.savefig("cd2d-2b.pdf")
+fig1.savefig("cd2d-2.pdf")
