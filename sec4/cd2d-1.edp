@@ -1,0 +1,32 @@
+// parameters 
+func g = 0;
+func f = 1;
+func bx = 5;
+func by = 5;
+real nu = atof(ARGV[2]); // freefem++ cd2d-1.edp nu のように使う
+
+// triangulation
+int k = 10;
+mesh Th = square(k,k);
+
+// P1 element
+fespace Vh(Th,P1); 
+Vh u, v, hh = hTriangle;
+
+// solve
+solve poisson(u, v)
+ = int2d(Th)(nu*dx(u)*dx(v) + nu*dy(u)*dy(v) - bx*u*dx(v) - by*u*dy(v)) - int2d(Th)(f*v) + on(1,2,3,4, u = g);
+
+//results
+ofstream f1("cd2d-1.plt");
+f1 << "# cd2d-1.edp: " << hh[].max << endl << endl;
+int i, j; 
+for(i = 0; i < Th.nt ; i++){
+   for(j = 0; j < 3; j++){
+	f1 << Th[i][j].x << " "<< Th[i][j].y << " " << u[][Vh(i,j)] << endl;
+   }
+   f1 << Th[i][0].x << " " << Th[i][0].y << " " << u[][Vh(i,0)] << endl << endl << endl;
+}
+
+// draw 
+plot(Th, ps="cd2d-1mesh.eps"); 
