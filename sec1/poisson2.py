@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import numpy as np
 from dolfin import *
-    
+
 # optimization options for the form compiler
 parameters["form_compiler"]["cpp_optimize"] = True
 parameters["form_compiler"]["optimize"] = True
@@ -17,12 +17,12 @@ mesh = Mesh("lshaped3.xml")
 #mesh = Mesh("lshaped4.xml")
 V = FunctionSpace(mesh, "CG", 1)
 
-# element data 
+# element data
 nodes = mesh.coordinates();
 elements = tri.Triangulation(nodes[:, 0], nodes[:, 1], mesh.cells());
-# len( mesh.cells())): number of elements  
-# mesh.cells(): list of elements   
-# mesh.coordinates(): list of node points 
+# len( mesh.cells())): number of elements
+# mesh.cells(): list of elements
+# mesh.coordinates(): list of node points
 
 # define Dirichlet boundary
 class DirichletBoundary(SubDomain):
@@ -40,13 +40,13 @@ v = TestFunction(V)
 # define right-hand side
 f = Expression('5.0*exp(-10.0*((x[0]+0.5)*(x[0]+0.5)+(x[1]-0.5)*(x[1]-0.5)))',degree=4)
 
-# solve Poisson 
+# solve Poisson
 a = inner(grad(u), grad(v))*dx
 L = f*v*dx
 u = Function(V)
 solve(a == L, u, bc)
 
-# convert function "u" into vector "solution_vec" 
+# convert function "u" into vector "solution_vec"
 solution_vec = u.compute_vertex_values(mesh)
 print (max(solution_vec))
 print (min(solution_vec))
@@ -55,8 +55,8 @@ print (min(solution_vec))
 # bird's-eye view
 fig1 = plt.figure(1)
 ax = fig1.gca(projection='3d')
-ax.plot_trisurf(nodes[:,0],nodes[:,1],solution_vec, cmap=plt.cm.Spectral, linewidth=0.1, antialiased=True)
-# contour-line 
+ax.plot_trisurf(nodes[:,0],nodes[:,1],solution_vec, triangles=elements.triangles, cmap=plt.cm.Spectral, linewidth=0.1, antialiased=True)
+# contour-line
 fig5 = plt.figure(5)
 plt.gca().set_aspect('equal')
 my_triangle = tri.Triangulation(nodes[:, 0], nodes[:, 1], mesh.cells())
@@ -74,7 +74,7 @@ plt.gca().spines['bottom'].set_visible(False)
 ax = plt.gca()
 ax.axes.xaxis.set_visible(False)
 ax.axes.yaxis.set_visible(False)
-# plot 
+# plot
 plt.show()
 # save
 fig1.savefig("poisson2a.pdf")

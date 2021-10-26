@@ -59,7 +59,7 @@ print (min(solution_vec))
 # bird's-eye view
 fig1 = plt.figure(1)
 ax = fig1.gca(projection='3d')
-ax.plot_trisurf(nodes[:,0],nodes[:,1],solution_vec, cmap=plt.cm.Spectral, linewidth=0.1, antialiased=True)
+ax.plot_trisurf(nodes[:,0],nodes[:,1],solution_vec, triangles=elements.triangles, cmap=plt.cm.Spectral, linewidth=0.1, antialiased=True)
 # plot 
 plt.show()
 # save
