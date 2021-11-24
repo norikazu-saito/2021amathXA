@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.tri as tri
 import numpy as np
 from dolfin import *
-    
+
 # optimization options for the form compiler
 parameters["form_compiler"]["cpp_optimize"] = True
 parameters["form_compiler"]["optimize"] = True
@@ -16,14 +16,15 @@ parameters["form_compiler"]["optimize"] = True
 mesh = Mesh("square1.xml")
 #mesh = Mesh("square2.xml")
 #mesh = Mesh("square3.xml")
-V = FunctionSpace(mesh, "CG", 1)
+#V = FunctionSpace(mesh, "CG", 1) #for P1 element
+V = FunctionSpace(mesh, "CG", 2)  #for P2 element
 
-# element data 
+# element data
 nodes = mesh.coordinates();
 elements = tri.Triangulation(nodes[:, 0], nodes[:, 1], mesh.cells());
-# len( mesh.cells())): number of elements  
-# mesh.cells(): list of elements   
-# mesh.coordinates(): list of node points 
+# len( mesh.cells())): number of elements
+# mesh.cells(): list of elements
+# mesh.coordinates(): list of node points
 
 # define Dirichlet boundary
 class DirichletBoundary(SubDomain):
@@ -31,7 +32,7 @@ class DirichletBoundary(SubDomain):
         return on_boundary
 
 # diffusion coefficient
-nu = Constant(0.063)
+nu = Constant(0.02)
 
 # define boundary condition
 u0 = Constant(0.0)
@@ -50,14 +51,14 @@ delta = Constant(1.0);
 h = CellDiameter(mesh)
 nb = sqrt(inner(b,b))
 tau = delta*h/(2*nb)
-    
+
 # solve diffusion-convection
 a = nu*inner(grad(u), grad(v))*dx + inner(b, grad(u))*v*dx + tau*inner(b, grad(u))*inner(b, grad(v))*dx
 L = f*v*dx + tau*f*inner(b, grad(v))*dx
 u = Function(V)
 solve(a == L, u, bc)
 
-# convert function "u" into vector "solution_vec" 
+# convert function "u" into vector "solution_vec"
 solution_vec = u.compute_vertex_values(mesh)
 #print (max(solution_vec))
 #print (min(solution_vec))
@@ -67,7 +68,7 @@ solution_vec = u.compute_vertex_values(mesh)
 fig1 = plt.figure(1)
 ax = fig1.gca(projection='3d')
 ax.plot_trisurf(nodes[:,0],nodes[:,1],solution_vec, triangles=elements.triangles, cmap=plt.cm.Spectral, linewidth=0.1, antialiased=True)
-# plot 
+# plot
 plt.show()
 # save
 fig1.savefig("cd2d-stab1.pdf")
